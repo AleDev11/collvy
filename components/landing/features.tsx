@@ -38,7 +38,7 @@ const features = [
     icon: Code,
     title: "Open source",
     description:
-      "Fully open source under MIT. Self-host on your own infra, contribute features, or use our managed cloud.",
+      "Fully open source under AGPL-3.0. Self-host on your own infra, contribute features, or use our managed cloud.",
   },
 ]
 

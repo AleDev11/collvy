@@ -122,4 +122,4 @@ prisma/
 
 ## License
 
-MIT
+[AGPL-3.0](LICENSE) — You can self-host, modify, and contribute. If you offer a modified version as a service, you must open-source your changes.
