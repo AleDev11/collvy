@@ -1,35 +1,44 @@
-import { Kanban, MessageCircle, Calendar, Users, Shield, Zap } from "lucide-react"
+import { Kanban, FileText, CalendarCheck, FolderOpen, Users, Code } from "lucide-react"
 
 const features = [
   {
     icon: Kanban,
     title: "Kanban boards",
-    description: "Organize tasks visually with drag-and-drop boards. Track progress from backlog to done.",
+    badge: "Like Trello",
+    description:
+      "Drag-and-drop boards to organize tasks visually. Create columns, assign members, set priorities, and track progress from backlog to done.",
   },
   {
-    icon: MessageCircle,
-    title: "Team chat",
-    description: "Real-time messaging with channels and DMs. Keep conversations next to your work.",
+    icon: FileText,
+    title: "Team docs",
+    badge: "Like Notion",
+    description:
+      "Rich-text documents attached to any project. Meeting notes, specs, wikis — everything lives next to the work it belongs to.",
   },
   {
-    icon: Calendar,
-    title: "Shared calendar",
-    description: "Plan sprints, deadlines, and meetings in one view. Never miss a milestone.",
+    icon: CalendarCheck,
+    title: "Task planner",
+    badge: "Like Planner",
+    description:
+      "Plan sprints and deadlines with a calendar view. Assign tasks, set due dates, and see who's working on what at a glance.",
+  },
+  {
+    icon: FolderOpen,
+    title: "Projects",
+    description:
+      "Group boards and docs into projects. Each project is a self-contained workspace with its own tasks, docs, and timeline.",
   },
   {
     icon: Users,
-    title: "Workspaces",
-    description: "Create separate workspaces for each team or company. Invite members with a single link.",
+    title: "Workspaces & roles",
+    description:
+      "One workspace per company or team. Invite with a link, assign roles (owner, admin, member), and control access.",
   },
   {
-    icon: Shield,
-    title: "Role-based access",
-    description: "Owners, admins, and members — control who can do what across your workspace.",
-  },
-  {
-    icon: Zap,
-    title: "Built for speed",
-    description: "Instant page loads and real-time updates. No spinners, no waiting.",
+    icon: Code,
+    title: "Open source",
+    description:
+      "Fully open source under MIT. Self-host on your own infra, contribute features, or use our managed cloud.",
   },
 ]
 
@@ -39,21 +48,28 @@ export function Features() {
       <div className="mx-auto max-w-6xl">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-            Everything your team needs
+            Replace your tool stack
           </h2>
           <p className="mt-4 text-muted-foreground">
-            One platform to replace your scattered stack of tools.
+            Boards, docs, and planner — one platform, one subscription.
           </p>
         </div>
 
-        <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
             <div
               key={feature.title}
               className="rounded-xl border bg-card p-6 transition-shadow hover:shadow-md"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <feature.icon className="h-5 w-5 text-primary" />
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                  <feature.icon className="h-5 w-5 text-primary" />
+                </div>
+                {"badge" in feature && feature.badge && (
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                    {feature.badge}
+                  </span>
+                )}
               </div>
               <h3 className="mt-4 font-semibold">{feature.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">

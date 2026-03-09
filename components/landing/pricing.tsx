@@ -6,41 +6,46 @@ import { Button } from "@/components/ui/button"
 import { Check, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+const GITHUB_URL = "https://github.com/AleDev11/collvy"
+
 const plans = [
   {
-    name: "Free",
+    name: "Self-hosted",
     monthlyPrice: 0,
     yearlyPrice: 0,
-    description: "For small teams getting started",
+    description: "Open source, run it yourself",
     features: [
-      { text: "Up to 5 members", included: true },
-      { text: "3 Kanban projects", included: true },
-      { text: "5 chat channels", included: true },
-      { text: "DMs & calendar", included: true },
-      { text: "1 GB storage", included: true },
-      { text: "30-day message history", included: true },
-      { text: "Advanced roles", included: false },
-      { text: "Audit logs", included: false },
+      { text: "Unlimited everything", included: true },
+      { text: "Your own infrastructure", included: true },
+      { text: "Full source code access", included: true },
+      { text: "Boards, docs & planner", included: true },
+      { text: "Community support", included: true },
+      { text: "Automatic updates", included: false },
+      { text: "Managed hosting", included: false },
+      { text: "Priority support", included: false },
     ],
-    cta: "Get started",
+    cta: "View on GitHub",
+    ctaHref: GITHUB_URL,
     variant: "outline" as const,
+    external: true,
   },
   {
     name: "Pro",
     monthlyPrice: 8,
     yearlyPrice: 6,
-    description: "For growing teams that need more",
+    description: "Managed cloud, zero setup",
     features: [
       { text: "Up to 25 members", included: true },
-      { text: "Unlimited projects", included: true },
-      { text: "Unlimited channels", included: true },
-      { text: "DMs & calendar", included: true },
+      { text: "Unlimited projects & boards", included: true },
+      { text: "Docs & task planner", included: true },
       { text: "10 GB storage", included: true },
-      { text: "Unlimited message history", included: true },
-      { text: "Advanced roles & admin panel", included: true },
-      { text: "Audit logs & SSO", included: false },
+      { text: "Admin panel & roles", included: true },
+      { text: "Automatic updates", included: true },
+      { text: "Managed hosting", included: true },
+      { text: "Priority support", included: false },
     ],
     cta: "Start free trial",
+    ctaHref: "/register",
     variant: "default" as const,
     highlighted: true,
   },
@@ -51,15 +56,16 @@ const plans = [
     description: "For orgs that need full control",
     features: [
       { text: "Unlimited members", included: true },
-      { text: "Unlimited projects", included: true },
-      { text: "Unlimited channels", included: true },
-      { text: "DMs & calendar", included: true },
+      { text: "Unlimited projects & boards", included: true },
+      { text: "Docs & task planner", included: true },
       { text: "100 GB storage", included: true },
-      { text: "Unlimited message history", included: true },
-      { text: "Advanced roles & admin panel", included: true },
-      { text: "Audit logs, SSO & custom integrations", included: true },
+      { text: "Admin panel, roles & audit logs", included: true },
+      { text: "Automatic updates", included: true },
+      { text: "Managed hosting", included: true },
+      { text: "Priority support & SLA", included: true },
     ],
     cta: "Contact sales",
+    ctaHref: "/register",
     variant: "outline" as const,
   },
 ]
@@ -72,10 +78,10 @@ export function Pricing() {
       <div className="mx-auto max-w-6xl">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-            Simple pricing
+            Open source. Cloud optional.
           </h2>
           <p className="mt-4 text-muted-foreground">
-            Start free, upgrade when you need to.
+            Self-host for free or let us handle everything.
           </p>
 
           <div className="mt-8 inline-flex items-center rounded-full border bg-muted/50 p-1 text-sm">
@@ -95,8 +101,8 @@ export function Pricing() {
                 annual ? "bg-background font-medium shadow-sm" : "text-muted-foreground",
               )}
             >
-              Annual
-              <span className="ml-1.5 text-xs text-primary">save 20%+</span>
+              Annual{" "}
+              <span className="text-xs text-primary">save 20%+</span>
             </button>
           </div>
         </div>
@@ -135,11 +141,9 @@ export function Pricing() {
                     )}
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {!isFree && annual
-                      ? `billed annually ($${plan.monthlyPrice}/mo if monthly)`
-                      : !isFree
-                        ? "billed monthly"
-                        : "\u00A0"}
+                    {isFree && "Free forever — open source"}
+                    {!isFree && annual && `billed annually ($${plan.monthlyPrice}/mo if monthly)`}
+                    {!isFree && !annual && "billed monthly"}
                   </p>
                 </div>
 
@@ -162,9 +166,17 @@ export function Pricing() {
                   ))}
                 </ul>
 
-                <Button className="mt-8 w-full" variant={plan.variant} asChild>
-                  <Link href="/register">{plan.cta}</Link>
-                </Button>
+                {"external" in plan && plan.external ? (
+                  <Button className="mt-8 w-full" variant={plan.variant} asChild>
+                    <a href={plan.ctaHref} target="_blank" rel="noopener noreferrer">
+                      {plan.cta}
+                    </a>
+                  </Button>
+                ) : (
+                  <Button className="mt-8 w-full" variant={plan.variant} asChild>
+                    <Link href={plan.ctaHref}>{plan.cta}</Link>
+                  </Button>
+                )}
               </div>
             )
           })}
