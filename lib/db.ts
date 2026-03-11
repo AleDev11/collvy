@@ -1,12 +1,19 @@
 import { PrismaClient } from "../generated/prisma/client"
-import { PrismaLibSql } from "@prisma/adapter-libsql"
-import path from "node:path"
+import { PrismaNeon } from "@prisma/adapter-neon"
+import { neonConfig } from "@neondatabase/serverless"
+import ws from "ws"
 
-const dbPath = path.join(process.cwd(), "dev.db")
-const adapter = new PrismaLibSql({ url: `file:${dbPath}` })
+if (process.env.NODE_ENV !== "production") {
+  neonConfig.webSocketConstructor = ws
+}
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
-export const db = globalForPrisma.prisma || new PrismaClient({ adapter })
+function createPrismaClient() {
+  const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL })
+  return new PrismaClient({ adapter })
+}
+
+export const db = globalForPrisma.prisma ?? createPrismaClient()
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db
