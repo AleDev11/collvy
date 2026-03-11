@@ -65,12 +65,12 @@ export default function LoginPage() {
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="you@example.com" required />
+            <Input id="email" name="email" type="email" placeholder="you@example.com" required suppressHydrationWarning />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" placeholder="Your password" required />
+            <Input id="password" name="password" type="password" placeholder="Your password" required suppressHydrationWarning />
           </div>
 
           <Button type="submit" className="w-full" disabled={pending}>

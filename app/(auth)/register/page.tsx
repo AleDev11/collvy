@@ -37,12 +37,12 @@ export default function RegisterPage() {
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="you@example.com" required />
+            <Input id="email" name="email" type="email" placeholder="you@example.com" required suppressHydrationWarning />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" placeholder="Min. 8 characters" required minLength={8} />
+            <Input id="password" name="password" type="password" placeholder="Min. 8 characters" required minLength={8} suppressHydrationWarning />
             <p className="text-xs text-muted-foreground">
               Must include uppercase, lowercase, and a number
             </p>
