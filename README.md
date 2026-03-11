@@ -22,7 +22,7 @@ Teams use too many disconnected tools — Trello for boards, Notion for docs, Pl
 | Language | TypeScript |
 | UI | shadcn/ui + Tailwind CSS 4 |
 | Auth | NextAuth v5 (credentials + Google OAuth) |
-| Database | SQLite (dev) via Prisma 7 + LibSQL adapter |
+| Database | PostgreSQL via Neon + Prisma 7 + Neon adapter |
 | Validation | Zod 4 |
 | Runtime | Node.js |
 
@@ -34,15 +34,18 @@ git clone https://github.com/AleDev11/collvy.git
 cd collvy
 
 # Install
-bun install
+npm install
+
+# Setup env
+cp .env.example .env.local
+# Fill DATABASE_URL with your Neon connection string
+# Fill AUTH_SECRET with: openssl rand -base64 32
 
 # Setup database
-cp .env.example .env
-bunx prisma db push
-bunx prisma generate
+npx prisma migrate dev
 
 # Run
-bun dev
+npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
@@ -94,8 +97,8 @@ prisma/
 - [x] Security (rate limiting, input validation, security headers)
 
 ### Week 2 — Core product
-- [ ] Dashboard with sidebar layout
-- [ ] Workspace switcher
+- [x] Dashboard with sidebar layout
+- [x] Workspace switcher
 - [ ] Project CRUD
 - [ ] Kanban boards (columns, tasks, drag-and-drop)
 

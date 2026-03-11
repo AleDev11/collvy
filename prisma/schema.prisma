@@ -70,7 +70,21 @@ model Workspace {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  members WorkspaceMember[]
+  members  WorkspaceMember[]
+  projects Project[]
+}
+
+// ─── Projects ──────────────────────────────────────────────
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  icon        String   @default("folder")
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 }
 
 model WorkspaceMember {
