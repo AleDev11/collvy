@@ -100,6 +100,10 @@ export function NavUser({ user }: { user: SidebarUser }) {
                 Account
               </a>
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme(getNextTheme())}>
+              <ThemeIcon />
+              Theme: {getThemeLabel()}
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/login" })}>
               <LogOutIcon />

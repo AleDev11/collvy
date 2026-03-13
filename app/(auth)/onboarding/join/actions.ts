@@ -5,6 +5,7 @@ import { db } from "@/lib/db"
 import { rateLimit } from "@/lib/rate-limit"
 import { redirect } from "next/navigation"
 import { z } from "zod/v4"
+import { checkMemberLimit } from "@/lib/billing"
 
 const schema = z.object({
   code: z.string().min(1, "Invite code is required").max(64).trim(),
@@ -43,6 +44,11 @@ export async function joinWorkspace(formData: FormData) {
 
   if (existing) {
     redirect("/dashboard")
+  }
+
+  const limit = await checkMemberLimit(workspace.id)
+  if (!limit.allowed) {
+    return { error: `This workspace has reached its member limit (${limit.current}/${limit.limit}). Ask the owner to upgrade their plan.` }
   }
 
   await db.workspaceMember.create({

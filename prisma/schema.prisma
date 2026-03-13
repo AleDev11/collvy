@@ -67,6 +67,53 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// ─── Billing ─────────────────────────────────────────────────
+
+enum PlanTier {
+  FREE
+  PRO
+  BUSINESS
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  CANCELED
+  PAST_DUE
+  INCOMPLETE
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  workspaceId          String             @unique
+  workspace            Workspace          @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  tier                 PlanTier           @default(FREE)
+  status               SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  stripePriceId        String?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+}
+
+model Invoice {
+  id              String    @id @default(cuid())
+  workspaceId     String
+  workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  stripeInvoiceId String?   @unique
+  amount          Int
+  currency        String    @default("usd")
+  status          String
+  invoiceUrl      String?
+  pdfUrl          String?
+  periodStart     DateTime
+  periodEnd       DateTime
+  createdAt       DateTime  @default(now())
+}
+
 // ─── Workspaces ────────────────────────────────────────────
 
 model Workspace {
@@ -77,8 +124,10 @@ model Workspace {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  members  WorkspaceMember[]
-  projects Project[]
+  members      WorkspaceMember[]
+  projects     Project[]
+  subscription Subscription?
+  invoices     Invoice[]
 }
 
 // ─── Projects ──────────────────────────────────────────────

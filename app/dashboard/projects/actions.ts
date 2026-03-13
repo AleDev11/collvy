@@ -5,15 +5,8 @@ import { db } from "@/lib/db"
 import { createProjectSchema } from "@/lib/validations/project"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
-
-async function getWorkspaceForUser(userId: string) {
-  const membership = await db.workspaceMember.findFirst({
-    where: { userId },
-    orderBy: { createdAt: "asc" },
-    select: { workspaceId: true },
-  })
-  return membership?.workspaceId ?? null
-}
+import { getActiveWorkspaceId, pickActiveMembership } from "@/lib/active-workspace"
+import { checkProjectLimit } from "@/lib/billing"
 
 export async function createProject(formData: FormData) {
   const session = await requireAuth()
@@ -28,8 +21,20 @@ export async function createProject(formData: FormData) {
     return { error: result.error.issues[0].message }
   }
 
-  const workspaceId = await getWorkspaceForUser(session.user.id)
-  if (!workspaceId) redirect("/onboarding")
+  const memberships = await db.workspaceMember.findMany({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: "asc" },
+  })
+  if (memberships.length === 0) redirect("/onboarding")
+
+  const activeWorkspaceId = await getActiveWorkspaceId()
+  const membership = pickActiveMembership(memberships, activeWorkspaceId)
+  const workspaceId = membership.workspaceId
+
+  const limit = await checkProjectLimit(workspaceId)
+  if (!limit.allowed) {
+    return { error: `Project limit reached (${limit.current}/${limit.limit}). Upgrade your plan to create more projects.` }
+  }
 
   const project = await db.project.create({
     data: {

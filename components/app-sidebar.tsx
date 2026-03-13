@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { LayoutDashboardIcon, KanbanIcon, FileTextIcon, CalendarIcon, Settings2Icon, SearchIcon } from "lucide-react"
+import { LayoutDashboardIcon, KanbanIcon, FileTextIcon, CalendarIcon, Settings2Icon, SearchIcon, CreditCardIcon } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
@@ -45,6 +45,11 @@ const navMain = [
     title: "Settings",
     url: "/dashboard/settings",
     icon: <Settings2Icon />,
+  },
+  {
+    title: "Billing",
+    url: "/dashboard/billing",
+    icon: <CreditCardIcon />,
   },
 ]
 
@@ -108,9 +113,7 @@ export function AppSidebar({
           <NavProjects projects={projects} />
         </SidebarContent>
         <SidebarFooter>
-          <div className="flex items-center justify-end px-2 pb-1">
-            <NotificationBell />
-          </div>
+          <NotificationBell />
           <NavUser user={user} />
         </SidebarFooter>
         <SidebarRail />
