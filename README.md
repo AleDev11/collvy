@@ -99,8 +99,8 @@ prisma/
 ### Week 2 — Core product
 - [x] Dashboard with sidebar layout
 - [x] Workspace switcher
-- [ ] Project CRUD
-- [ ] Kanban boards (columns, tasks, drag-and-drop)
+- [x] Project CRUD
+- [x] Kanban boards (columns, tasks, drag-and-drop)
 
 ### Week 3 — Docs & Planner
 - [ ] Rich-text editor for docs
@@ -110,7 +110,7 @@ prisma/
 
 ### Week 4 — Polish
 - [ ] Settings page
-- [ ] Member management & invites
+- [x] Member management & invites
 - [ ] Responsive design pass
 - [ ] Deploy to production
 

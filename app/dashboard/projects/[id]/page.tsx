@@ -20,6 +20,7 @@ import {
 import { DeleteProjectButton } from "./delete-project-button"
 import { EditProjectButton } from "./edit-project-button"
 import { ProjectIcon } from "@/components/project-icon"
+import { PROJECT_ICONS } from "@/lib/validations/project"
 import {
   KanbanIcon,
   FileTextIcon,
@@ -56,7 +57,7 @@ export default async function ProjectPage({ params }: { readonly params: Promise
   const { id } = await params
   const session = await requireAuth()
 
-  const [project, memberships] = await Promise.all([
+  const [project, memberships, recentDocs, totalDocs] = await Promise.all([
     db.project.findUnique({
       where: { id },
       include: {
@@ -89,6 +90,13 @@ export default async function ProjectPage({ params }: { readonly params: Promise
       include: { workspace: { include: { projects: true } } },
       orderBy: { createdAt: "asc" },
     }),
+    db.doc.findMany({
+      where: { projectId: id },
+      orderBy: { updatedAt: "desc" },
+      take: 5,
+      select: { id: true, title: true, icon: true, updatedAt: true },
+    }),
+    db.doc.count({ where: { projectId: id } }),
   ])
 
   if (!project) notFound()
@@ -197,15 +205,18 @@ export default async function ProjectPage({ params }: { readonly params: Promise
                 <p className="text-xs text-muted-foreground">{totalColumns} columns · {totalCards} cards</p>
               </div>
             </Link>
-            <div className="flex items-center gap-4 rounded-xl border bg-card p-4 opacity-50 cursor-not-allowed">
+            <Link
+              href={`/dashboard/projects/${project.id}/docs`}
+              className="flex items-center gap-4 rounded-xl border bg-card p-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
+            >
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10">
                 <FileTextIcon className="h-4.5 w-4.5 text-blue-500" />
               </div>
               <div>
                 <p className="text-sm font-medium">Docs</p>
-                <p className="text-xs text-muted-foreground">Coming soon</p>
+                <p className="text-xs text-muted-foreground">{totalDocs} page{totalDocs === 1 ? "" : "s"}</p>
               </div>
-            </div>
+            </Link>
             <div className="flex items-center gap-4 rounded-xl border bg-card p-4 opacity-50 cursor-not-allowed">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10">
                 <CalendarDaysIcon className="h-4.5 w-4.5 text-emerald-500" />
@@ -327,6 +338,47 @@ export default async function ProjectPage({ params }: { readonly params: Promise
               )}
             </div>
           </div>
+
+          {/* Recent docs */}
+          {recentDocs.length > 0 && (
+            <div className="rounded-xl border bg-card p-6">
+              <h2 className="mb-5 text-sm font-semibold flex items-center gap-2">
+                <FileTextIcon className="h-4 w-4 text-muted-foreground" />
+                Recent documents
+              </h2>
+              <div className="divide-y">
+                {recentDocs.map((doc) => (
+                  <Link
+                    key={doc.id}
+                    href={`/dashboard/projects/${project.id}/docs/${doc.id}`}
+                    className="flex items-center gap-3 py-2.5 hover:text-foreground text-sm transition-colors group"
+                  >
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted">
+                      {(PROJECT_ICONS as readonly string[]).includes(doc.icon) ? (
+                        <ProjectIcon icon={doc.icon} className="h-3.5 w-3.5 text-muted-foreground" />
+                      ) : (
+                        <span className="text-sm leading-none">{doc.icon}</span>
+                      )}
+                    </div>
+                    <span className="flex-1 truncate font-medium group-hover:underline underline-offset-2">
+                      {doc.title || "Untitled"}
+                    </span>
+                    <span className="text-xs text-muted-foreground shrink-0">
+                      {timeAgo(doc.updatedAt)}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+              {totalDocs > 5 && (
+                <Link
+                  href={`/dashboard/projects/${project.id}/docs`}
+                  className="mt-3 flex items-center justify-center text-xs text-muted-foreground hover:text-foreground transition-colors pt-3 border-t"
+                >
+                  View all {totalDocs} documents →
+                </Link>
+              )}
+            </div>
+          )}
 
           {/* Members */}
           <div className="rounded-xl border bg-card p-6">

@@ -25,6 +25,8 @@ model User {
   assignedCards Card[]        @relation("CardAssignee")
   comments      Comment[]
   activityLogs  ActivityLog[]
+  docs          Doc[]
+  docVersions   DocVersion[]
 }
 
 model Account {
@@ -90,6 +92,7 @@ model Project {
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   columns   Column[]
   cards     Card[]
+  docs      Doc[]
 }
 
 model WorkspaceMember {
@@ -161,4 +164,37 @@ model ActivityLog {
 
   card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id])
+}
+
+// ─── Docs ────────────────────────────────────────────────────
+
+model Doc {
+  id        String   @id @default(cuid())
+  title     String   @default("Untitled")
+  icon      String   @default("📄")
+  content   Json     @default("{}")
+  projectId String
+  authorId  String
+  parentId  String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project  Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author   User         @relation(fields: [authorId], references: [id])
+  parent   Doc?         @relation("DocChildren", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children Doc[]        @relation("DocChildren")
+  versions DocVersion[]
+}
+
+model DocVersion {
+  id        String   @id @default(cuid())
+  docId     String
+  title     String
+  content   Json
+  authorId  String
+  createdAt DateTime @default(now())
+
+  doc    Doc  @relation(fields: [docId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id])
 }
