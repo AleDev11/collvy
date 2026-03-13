@@ -217,15 +217,18 @@ export default async function ProjectPage({ params }: { readonly params: Promise
                 <p className="text-xs text-muted-foreground">{totalDocs} page{totalDocs === 1 ? "" : "s"}</p>
               </div>
             </Link>
-            <div className="flex items-center gap-4 rounded-xl border bg-card p-4 opacity-50 cursor-not-allowed">
+            <Link
+              href={`/dashboard/projects/${project.id}/planner`}
+              className="flex items-center gap-4 rounded-xl border bg-card p-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
+            >
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10">
                 <CalendarDaysIcon className="h-4.5 w-4.5 text-emerald-500" />
               </div>
               <div>
                 <p className="text-sm font-medium">Planner</p>
-                <p className="text-xs text-muted-foreground">Coming soon</p>
+                <p className="text-xs text-muted-foreground">Tasks & schedule</p>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Stat cards */}

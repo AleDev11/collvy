@@ -19,14 +19,15 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  workspaces    WorkspaceMember[]
-  assignedCards Card[]        @relation("CardAssignee")
-  comments      Comment[]
-  activityLogs  ActivityLog[]
-  docs          Doc[]
-  docVersions   DocVersion[]
+  accounts            Account[]
+  sessions            Session[]
+  workspaces          WorkspaceMember[]
+  assignedCards       Card[]             @relation("CardAssignee")
+  comments            Comment[]
+  activityLogs        ActivityLog[]
+  docs                Doc[]
+  docVersions         DocVersion[]
+  planTaskAssignments PlanTaskAssignee[]
 }
 
 model Account {
@@ -89,10 +90,12 @@ model Project {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  columns   Column[]
-  cards     Card[]
-  docs      Doc[]
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  columns     Column[]
+  cards       Card[]
+  docs        Doc[]
+  planBuckets PlanBucket[]
+  planTasks   PlanTask[]
 }
 
 model WorkspaceMember {
@@ -164,6 +167,63 @@ model ActivityLog {
 
   card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id])
+}
+
+// ─── Planner ─────────────────────────────────────────────────
+
+model PlanBucket {
+  id        String   @id @default(cuid())
+  name      String
+  order     Int      @default(0)
+  projectId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks   PlanTask[]
+}
+
+model PlanTask {
+  id        String    @id @default(cuid())
+  title     String
+  notes     String?
+  priority  String    @default("medium") // urgent | important | medium | low
+  progress  String    @default("not_started") // not_started | in_progress | completed
+  startDate DateTime?
+  dueDate   DateTime?
+  labels    String[]  @default([])
+  order     Int       @default(0)
+  bucketId  String
+  projectId String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  bucket    PlanBucket         @relation(fields: [bucketId], references: [id], onDelete: Cascade)
+  project   Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignees PlanTaskAssignee[]
+  checklist PlanChecklist[]
+}
+
+model PlanTaskAssignee {
+  id     String @id @default(cuid())
+  taskId String
+  userId String
+
+  task PlanTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([taskId, userId])
+}
+
+model PlanChecklist {
+  id        String   @id @default(cuid())
+  title     String
+  checked   Boolean  @default(false)
+  order     Int      @default(0)
+  taskId    String
+  createdAt DateTime @default(now())
+
+  task PlanTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
 // ─── Docs ────────────────────────────────────────────────────

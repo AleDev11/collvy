@@ -687,11 +687,13 @@ function CardDetailDialog({
 function KanbanCard({
   card,
   onOpen,
+  onQuickComplete,
   overlay = false,
   disableDrag = false,
 }: {
   card: CardType
   onOpen?: () => void
+  onQuickComplete?: () => void
   overlay?: boolean
   disableDrag?: boolean
 }) {
@@ -724,6 +726,17 @@ function KanbanCard({
       >
         <GripVerticalIcon className="h-3.5 w-3.5" />
       </button>
+
+      {/* Quick complete */}
+      {onQuickComplete && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onQuickComplete() }}
+          className="absolute right-2.5 top-3.5 opacity-0 group-hover:opacity-100 transition-opacity h-5 w-5 rounded-full border-2 border-muted-foreground/30 hover:border-green-500 hover:bg-green-500/10 flex items-center justify-center"
+          title="Mark complete"
+        >
+          <CheckIcon className="h-3 w-3 text-muted-foreground/50 hover:text-green-500" />
+        </button>
+      )}
 
       <button
         className="w-full text-left pl-8 pr-4 pt-4 pb-3.5"
@@ -844,12 +857,14 @@ function KanbanColumn({
   projectId,
   onOpenCard,
   onColorChange,
+  onQuickComplete,
   activeCardId,
 }: {
   column: ColumnType
   projectId: string
   onOpenCard: (card: CardType) => void
   onColorChange: (columnId: string, color: string) => void
+  onQuickComplete: (card: CardType) => void
   activeCardId: string | null
 }) {
   const [addingCard, setAddingCard] = useState(false)
@@ -995,6 +1010,7 @@ function KanbanColumn({
               key={card.id}
               card={card}
               onOpen={() => onOpenCard(card)}
+              onQuickComplete={() => onQuickComplete(card)}
               disableDrag={false}
             />
           ))}
@@ -1197,6 +1213,22 @@ export function KanbanBoard({
     }
   }
 
+  function handleQuickComplete(card: CardType) {
+    const lastCol = columns[columns.length - 1]
+    if (!lastCol || card.columnId === lastCol.id) return
+    const order = lastCol.cards.length
+    setColumns((prev) =>
+      prev.map((col) => {
+        if (col.id === card.columnId) return { ...col, cards: col.cards.filter((c) => c.id !== card.id) }
+        if (col.id === lastCol.id) return { ...col, cards: [...col.cards, { ...card, columnId: lastCol.id, order }] }
+        return col
+      }),
+    )
+    startTransition(() =>
+      saveCardPositions(projectId, [{ id: card.id, columnId: lastCol.id, order }]),
+    )
+  }
+
   function handleColumnColorChange(columnId: string, color: string) {
     setColumns((prev) =>
       prev.map((col) => (col.id === columnId ? { ...col, color } : col)),
@@ -1272,6 +1304,7 @@ export function KanbanBoard({
                 activeCardId={activeCard?.id ?? null}
                 onOpenCard={(card) => setDetailCardId(card.id)}
                 onColorChange={handleColumnColorChange}
+                onQuickComplete={handleQuickComplete}
               />
             ))}
           </SortableContext>
