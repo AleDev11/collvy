@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { GeneralSection } from "./general-section"
-import { MembersSection } from "./members-section"
+import { MembersSectionClient } from "./members-section-client"
 
 export default async function SettingsPage() {
   const session = await requireAuth()
@@ -91,7 +91,7 @@ export default async function SettingsPage() {
           </div>
         </header>
 
-        <div className="flex flex-1 flex-col gap-8 p-6 max-w-2xl">
+        <div className="flex flex-1 flex-col gap-8 p-6 max-w-2xl w-full mx-auto">
           <div>
             <h1 className="text-2xl font-semibold">Settings</h1>
             <p className="text-sm text-muted-foreground mt-1">{workspace.name}</p>
@@ -102,8 +102,7 @@ export default async function SettingsPage() {
             inviteCode={workspace.inviteCode}
             currentUserRole={currentMembership.role}
           />
-          <Separator />
-          <MembersSection
+          <MembersSectionClient
             workspaceId={workspace.id}
             members={members}
             currentUserRole={currentMembership.role}

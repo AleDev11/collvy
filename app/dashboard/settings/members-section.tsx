@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { ConfirmDialog } from "@/components/confirm-dialog"
-import { MoreHorizontalIcon, ShieldIcon, UserIcon, LogOutIcon, UserXIcon } from "lucide-react"
+import { MoreHorizontalIcon, ShieldIcon, UserIcon, LogOutIcon, UserXIcon, UsersIcon } from "lucide-react"
 import { updateMemberRole, removeMember, leaveWorkspace } from "./actions"
 import { cn } from "@/lib/utils"
 
@@ -38,7 +38,7 @@ const ROLE_LABELS: Record<string, string> = {
 }
 
 const ROLE_STYLES: Record<string, string> = {
-  owner: "bg-primary/10 text-primary",
+  owner: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
   admin: "bg-amber-500/10 text-amber-600",
   member: "bg-muted text-muted-foreground",
 }
@@ -93,10 +93,10 @@ function MemberRow({
   const showMenu = canManage || canRemove || canLeave
 
   return (
-    <div className={cn("flex items-center gap-3 py-3", pending && "opacity-50 pointer-events-none")}>
-      <Avatar className="h-8 w-8 shrink-0">
+    <div className={cn("flex items-center gap-3 py-3 px-4", pending && "opacity-50 pointer-events-none")}>
+      <Avatar className="h-9 w-9 shrink-0">
         <AvatarImage src={member.image ?? undefined} alt={member.name} />
-        <AvatarFallback className="text-xs">{getInitials(member.name)}</AvatarFallback>
+        <AvatarFallback className="text-xs font-medium">{getInitials(member.name)}</AvatarFallback>
       </Avatar>
 
       <div className="flex-1 min-w-0">
@@ -111,7 +111,7 @@ function MemberRow({
 
       <span
         className={cn(
-          "shrink-0 rounded-full px-2 py-0.5 text-xs font-medium",
+          "shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium",
           ROLE_STYLES[member.role] ?? ROLE_STYLES.member,
         )}
       >
@@ -121,7 +121,7 @@ function MemberRow({
       {showMenu && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0">
+            <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-muted-foreground">
               <MoreHorizontalIcon className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -190,16 +190,19 @@ function MemberRow({
 export function MembersSection({ workspaceId, members, currentUserRole }: Props) {
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10">
+          <UsersIcon className="h-4 w-4 text-blue-500" />
+        </div>
         <div>
           <h2 className="text-base font-semibold">Members</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {members.length} {members.length === 1 ? "member" : "members"}
-          </p>
         </div>
+        <span className="ml-auto rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+          {members.length}
+        </span>
       </div>
 
-      <div className="divide-y">
+      <div className="rounded-xl border bg-card divide-y overflow-hidden">
         {members.map((member) => (
           <MemberRow
             key={member.id}

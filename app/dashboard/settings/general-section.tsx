@@ -3,7 +3,7 @@
 import { useActionState, useTransition, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { CopyIcon, RefreshCwIcon, CheckIcon } from "lucide-react"
+import { CopyIcon, RefreshCwIcon, CheckIcon, Settings2Icon, LinkIcon } from "lucide-react"
 import { updateWorkspaceName, regenerateInviteCode } from "./actions"
 import { ConfirmDialog } from "@/components/confirm-dialog"
 
@@ -42,50 +42,58 @@ export function GeneralSection({ workspaceId, workspaceName, inviteCode, current
   }
 
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="space-y-4">
+      {/* Section header */}
+      <div className="flex items-center gap-2">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-500/10">
+          <Settings2Icon className="h-4 w-4 text-violet-500" />
+        </div>
         <h2 className="text-base font-semibold">General</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">Manage your workspace settings</p>
       </div>
 
-      {/* Workspace name */}
-      <form action={nameAction} className="space-y-3">
-        <div className="space-y-1.5">
-          <p className="text-sm font-medium">Workspace name</p>
-          <Input
-            name="name"
-            defaultValue={workspaceName}
-            disabled={!canEdit}
-            maxLength={50}
-            className="max-w-sm"
-          />
-          {nameState?.error && (
-            <p className="text-xs text-destructive">{nameState.error}</p>
+      {/* Workspace name card */}
+      <div className="rounded-xl border bg-card p-5">
+        <p className="text-sm font-medium">Workspace name</p>
+        <p className="text-xs text-muted-foreground mt-0.5 mb-4">The display name for your workspace.</p>
+        <form action={nameAction} className="flex items-start gap-3">
+          <div className="flex-1 space-y-1.5">
+            <Input
+              name="name"
+              defaultValue={workspaceName}
+              disabled={!canEdit}
+              maxLength={50}
+            />
+            {nameState?.error && (
+              <p className="text-xs text-destructive">{nameState.error}</p>
+            )}
+            {nameState?.success && (
+              <p className="text-xs text-emerald-600">Saved</p>
+            )}
+          </div>
+          {canEdit && (
+            <Button type="submit" size="sm" disabled={namePending} className="shrink-0">
+              {namePending ? "Saving..." : "Save"}
+            </Button>
           )}
-          {nameState?.success && (
-            <p className="text-xs text-emerald-600">Saved</p>
-          )}
-        </div>
-        {canEdit && (
-          <Button type="submit" size="sm" disabled={namePending}>
-            {namePending ? "Saving..." : "Save changes"}
-          </Button>
-        )}
-      </form>
+        </form>
+      </div>
 
-      {/* Invite code */}
-      <div className="space-y-1.5">
-        <p className="text-sm font-medium">Invite code</p>
-        <p className="text-xs text-muted-foreground">
+      {/* Invite code card */}
+      <div className="rounded-xl border bg-card p-5">
+        <div className="flex items-center gap-2 mb-0.5">
+          <LinkIcon className="h-3.5 w-3.5 text-muted-foreground" />
+          <p className="text-sm font-medium">Invite code</p>
+        </div>
+        <p className="text-xs text-muted-foreground mb-4">
           Share this code with teammates so they can join your workspace.
         </p>
-        <div className="flex items-center gap-2 max-w-sm">
+        <div className="flex items-center gap-2">
           <Input
             readOnly
             value={inviteCode}
-            className="font-mono text-sm"
+            className="font-mono text-sm bg-muted/50"
           />
-          <Button variant="outline" size="icon" onClick={handleCopy} title="Copy code">
+          <Button variant="outline" size="icon" onClick={handleCopy} title="Copy code" className="shrink-0">
             {copied ? <CheckIcon className="h-4 w-4 text-emerald-600" /> : <CopyIcon className="h-4 w-4" />}
           </Button>
           {canEdit && (
@@ -94,6 +102,7 @@ export function GeneralSection({ workspaceId, workspaceName, inviteCode, current
               size="icon"
               onClick={() => setConfirmOpen(true)}
               title="Regenerate code"
+              className="shrink-0"
             >
               <RefreshCwIcon className="h-4 w-4" />
             </Button>

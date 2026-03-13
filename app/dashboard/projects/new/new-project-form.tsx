@@ -37,7 +37,9 @@ export function NewProjectForm() {
 
       <form action={formAction} className="space-y-6" suppressHydrationWarning>
         {state?.error && (
-          <p className="text-sm text-destructive">{state.error}</p>
+          <div className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {state.error}
+          </div>
         )}
 
         {/* Name field */}
@@ -55,35 +57,41 @@ export function NewProjectForm() {
         {/* Icon picker */}
         <div className="space-y-2">
           <p className="text-sm font-medium">Icon</p>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(5, 1fr)",
-              gap: "0.375rem",
-            }}
-          >
-            {PROJECT_ICONS.map((icon) => (
-              <button
-                key={icon}
-                type="button"
-                title={icon}
-                onClick={() => setSelectedIcon(icon)}
-                className={cn(
-                  "aspect-square w-full flex items-center justify-center rounded-lg transition-all",
-                  selectedIcon === icon
-                    ? "bg-primary text-primary-foreground"
-                    : "border text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
-              >
-                <ProjectIcon icon={icon} className="h-5 w-5" />
-              </button>
-            ))}
+          <div className="rounded-xl border bg-muted/30 p-3">
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(5, 1fr)",
+                gap: "0.375rem",
+              }}
+            >
+              {PROJECT_ICONS.map((icon) => (
+                <button
+                  key={icon}
+                  type="button"
+                  title={icon}
+                  onClick={() => setSelectedIcon(icon)}
+                  className={cn(
+                    "aspect-square w-full flex items-center justify-center rounded-lg transition-all",
+                    selectedIcon === icon
+                      ? "bg-linear-to-br from-violet-500 to-blue-500 text-white shadow-md shadow-violet-500/25"
+                      : "text-muted-foreground hover:bg-background hover:text-foreground hover:shadow-sm"
+                  )}
+                >
+                  <ProjectIcon icon={icon} className="h-5 w-5" />
+                </button>
+              ))}
+            </div>
           </div>
           <input type="hidden" name="icon" value={selectedIcon} />
         </div>
 
         <div className="flex items-center gap-3 pt-2">
-          <Button type="submit" disabled={pending}>
+          <Button
+            type="submit"
+            disabled={pending}
+            className="bg-linear-to-r from-violet-600 to-blue-600 text-white shadow-lg shadow-violet-500/25 hover:from-violet-500 hover:to-blue-500 border-0"
+          >
             {pending ? "Creating..." : "Create project"}
           </Button>
           <Button variant="ghost" asChild>
