@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,14 +17,21 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { ChevronsUpDownIcon, PlusIcon, BuildingIcon } from "lucide-react"
+import { ChevronsUpDownIcon, PlusIcon, BuildingIcon, CheckIcon } from "lucide-react"
 import type { SidebarWorkspace } from "@/components/app-sidebar"
 
 export function WorkspaceSwitcher({ workspaces }: { workspaces: SidebarWorkspace[] }) {
   const { isMobile } = useSidebar()
-  const [active, setActive] = React.useState(workspaces[0])
+  const router = useRouter()
+  const active = workspaces[0]
 
   if (!active) return null
+
+  function switchWorkspace(ws: SidebarWorkspace) {
+    document.cookie = `activeWorkspaceId=${ws.id};path=/;max-age=31536000`
+    router.push("/dashboard")
+    router.refresh()
+  }
 
   return (
     <SidebarMenu>
@@ -56,13 +64,14 @@ export function WorkspaceSwitcher({ workspaces }: { workspaces: SidebarWorkspace
             {workspaces.map((ws, index) => (
               <DropdownMenuItem
                 key={ws.id}
-                onClick={() => setActive(ws)}
+                onClick={() => switchWorkspace(ws)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-md border">
                   <BuildingIcon className="size-3" />
                 </div>
-                {ws.name}
+                <span className="flex-1">{ws.name}</span>
+                {ws.id === active.id && <CheckIcon className="size-3.5 text-primary" />}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}

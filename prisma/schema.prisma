@@ -28,6 +28,7 @@ model User {
   docs                Doc[]
   docVersions         DocVersion[]
   planTaskAssignments PlanTaskAssignee[]
+  notifications       Notification[]
 }
 
 model Account {
@@ -224,6 +225,20 @@ model PlanChecklist {
   createdAt DateTime @default(now())
 
   task PlanTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+// ─── Notifications ───────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  url       String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // ─── Docs ────────────────────────────────────────────────────

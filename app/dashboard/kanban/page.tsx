@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import { requireAuth } from "@/lib/auth-guard"
 import { db } from "@/lib/db"
+import { getActiveWorkspaceId, pickActiveMembership } from "@/lib/active-workspace"
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
@@ -27,7 +28,8 @@ export default async function KanbanIndexPage() {
 
   if (memberships.length === 0) redirect("/onboarding")
 
-  const currentMembership = memberships[0]
+  const activeWorkspaceId = await getActiveWorkspaceId()
+  const currentMembership = pickActiveMembership(memberships, activeWorkspaceId)
   const projects = currentMembership.workspace.projects
 
   // If there's exactly one project, go straight to its kanban
@@ -42,12 +44,10 @@ export default async function KanbanIndexPage() {
     image: session.user.image ?? null,
   }
 
-  const workspaces = memberships.map((m) => ({
-    id: m.workspace.id,
-    name: m.workspace.name,
-    slug: m.workspace.slug,
-    role: m.role,
-  }))
+  const workspaces = [
+    { id: currentMembership.workspace.id, name: currentMembership.workspace.name, slug: currentMembership.workspace.slug, role: currentMembership.role },
+    ...memberships.filter((m) => m.workspaceId !== currentMembership.workspaceId).map((m) => ({ id: m.workspace.id, name: m.workspace.name, slug: m.workspace.slug, role: m.role })),
+  ]
 
   const sidebarProjects = projects.map((p) => ({
     id: p.id,

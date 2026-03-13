@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth-guard"
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
+import { getActiveWorkspaceId, pickActiveMembership } from "@/lib/active-workspace"
 import { AppSidebar } from "@/components/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
@@ -17,7 +18,8 @@ export default async function NewProjectPage() {
 
   if (memberships.length === 0) redirect("/onboarding")
 
-  const currentMembership = memberships[0]
+  const activeWorkspaceId = await getActiveWorkspaceId()
+  const currentMembership = pickActiveMembership(memberships, activeWorkspaceId)
 
   const user = {
     name: session.user.name ?? session.user.email ?? "User",
@@ -25,12 +27,10 @@ export default async function NewProjectPage() {
     image: session.user.image ?? null,
   }
 
-  const workspaces = memberships.map((m) => ({
-    id: m.workspace.id,
-    name: m.workspace.name,
-    slug: m.workspace.slug,
-    role: m.role,
-  }))
+  const workspaces = [
+    { id: currentMembership.workspace.id, name: currentMembership.workspace.name, slug: currentMembership.workspace.slug, role: currentMembership.role },
+    ...memberships.filter((m) => m.workspaceId !== currentMembership.workspaceId).map((m) => ({ id: m.workspace.id, name: m.workspace.name, slug: m.workspace.slug, role: m.role })),
+  ]
 
   const projects = currentMembership.workspace.projects.map((p) => ({
     id: p.id,

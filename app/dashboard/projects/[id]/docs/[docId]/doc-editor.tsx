@@ -117,7 +117,7 @@ type SlashCommand = {
 }
 
 // ── Image command callback (module-level so slash command can call it) ────────
-const _imageCallback = { fn: null as ((editor: any, range: any) => void) | null }
+const _imageCallback = { fn: null as ((editor: any) => void) | null }
 
 // ── Slash commands ────────────────────────────────────────────────────────────
 

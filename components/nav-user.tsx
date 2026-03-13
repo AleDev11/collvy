@@ -19,8 +19,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { ChevronsUpDownIcon, LogOutIcon, UserIcon } from "lucide-react"
+import { ChevronsUpDownIcon, LogOutIcon, UserIcon, SunIcon, MoonIcon, MonitorIcon } from "lucide-react"
 import { signOut } from "next-auth/react"
+import { useTheme } from "next-themes"
 import type { SidebarUser } from "@/components/app-sidebar"
 
 function initials(name: string) {
@@ -34,6 +35,25 @@ function initials(name: string) {
 
 export function NavUser({ user }: { user: SidebarUser }) {
   const { isMobile } = useSidebar()
+  const { theme, setTheme } = useTheme()
+
+  function getNextTheme() {
+    if (theme === "light") return "dark"
+    if (theme === "dark") return "system"
+    return "light"
+  }
+  function getThemeIcon() {
+    if (theme === "dark") return MoonIcon
+    if (theme === "light") return SunIcon
+    return MonitorIcon
+  }
+  function getThemeLabel() {
+    if (theme === "dark") return "Dark"
+    if (theme === "light") return "Light"
+    return "System"
+  }
+
+  const ThemeIcon = getThemeIcon()
 
   return (
     <SidebarMenu>
