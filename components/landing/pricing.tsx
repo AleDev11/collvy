@@ -102,7 +102,7 @@ export function Pricing() {
               )}
             >
               Annual{" "}
-              <span className="text-xs text-primary">save 20%+</span>
+              <span className="text-xs text-violet-500">save 20%+</span>
             </button>
           </div>
         </div>
@@ -116,14 +116,14 @@ export function Pricing() {
               <div
                 key={plan.name}
                 className={cn(
-                  "relative flex flex-col rounded-xl border p-8",
+                  "relative flex flex-col rounded-xl border p-8 transition-all duration-200",
                   plan.highlighted
-                    ? "border-primary bg-card shadow-lg"
-                    : "bg-card",
+                    ? "border-violet-500/30 bg-card shadow-xl shadow-violet-500/10 dark:shadow-violet-500/5"
+                    : "bg-card hover:-translate-y-0.5 hover:shadow-md hover:shadow-black/5 dark:hover:shadow-black/20",
                 )}
               >
                 {plan.highlighted && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-linear-to-r from-violet-600 to-blue-600 px-3 py-1 text-xs font-medium text-white">
                     Most popular
                   </div>
                 )}
@@ -133,7 +133,10 @@ export function Pricing() {
 
                 <div className="mt-6 h-16">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold">
+                    <span className={cn(
+                      "text-4xl font-bold",
+                      plan.highlighted && "bg-linear-to-r from-violet-500 to-blue-500 bg-clip-text text-transparent"
+                    )}>
                       {isFree ? "$0" : `$${price}`}
                     </span>
                     {!isFree && (
@@ -157,7 +160,7 @@ export function Pricing() {
                       )}
                     >
                       {feature.included ? (
-                        <Check className="h-4 w-4 shrink-0 text-primary" />
+                        <Check className={cn("h-4 w-4 shrink-0", plan.highlighted ? "text-violet-500" : "text-emerald-500")} />
                       ) : (
                         <X className="h-4 w-4 shrink-0 text-muted-foreground/50" />
                       )}
@@ -166,17 +169,32 @@ export function Pricing() {
                   ))}
                 </ul>
 
-                {"external" in plan && plan.external ? (
-                  <Button className="mt-8 w-full" variant={plan.variant} asChild>
-                    <a href={plan.ctaHref} target="_blank" rel="noopener noreferrer">
-                      {plan.cta}
-                    </a>
-                  </Button>
-                ) : (
-                  <Button className="mt-8 w-full" variant={plan.variant} asChild>
-                    <Link href={plan.ctaHref}>{plan.cta}</Link>
-                  </Button>
-                )}
+                {(() => {
+                  if ("external" in plan && plan.external) {
+                    return (
+                      <Button className="mt-8 w-full" variant={plan.variant} asChild>
+                        <a href={plan.ctaHref} target="_blank" rel="noopener noreferrer">
+                          {plan.cta}
+                        </a>
+                      </Button>
+                    )
+                  }
+                  if (plan.highlighted) {
+                    return (
+                      <Button
+                        className="mt-8 w-full bg-linear-to-r from-violet-600 to-blue-600 text-white shadow-lg shadow-violet-500/25 hover:from-violet-500 hover:to-blue-500 border-0"
+                        asChild
+                      >
+                        <Link href={plan.ctaHref}>{plan.cta}</Link>
+                      </Button>
+                    )
+                  }
+                  return (
+                    <Button className="mt-8 w-full" variant={plan.variant} asChild>
+                      <Link href={plan.ctaHref}>{plan.cta}</Link>
+                    </Button>
+                  )
+                })()}
               </div>
             )
           })}

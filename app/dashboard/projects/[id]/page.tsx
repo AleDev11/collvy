@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation"
-import Link from "next/link"
 import { requireAuth } from "@/lib/auth-guard"
 import { db } from "@/lib/db"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -21,7 +20,7 @@ import { DeleteProjectButton } from "./delete-project-button"
 import { ProjectIcon } from "@/components/project-icon"
 import { KanbanIcon, FileTextIcon, CalendarDaysIcon } from "lucide-react"
 
-export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ProjectPage({ params }: { readonly params: Promise<{ id: string }> }) {
   const { id } = await params
   const session = await requireAuth()
 
@@ -92,54 +91,43 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
         <div className="flex flex-1 flex-col gap-6 p-6">
           <div className="flex items-start justify-between">
             <div>
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border bg-muted/50">
-                <ProjectIcon icon={project.icon} className="h-5 w-5" />
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                <ProjectIcon icon={project.icon} className="h-6 w-6 text-primary" />
               </div>
               <h1 className="text-2xl font-semibold">{project.name}</h1>
-              <p className="text-muted-foreground text-sm mt-1">
-                {project.workspace.name}
-              </p>
+              <p className="text-muted-foreground text-sm mt-1">{project.workspace.name}</p>
             </div>
             <DeleteProjectButton projectId={project.id} />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Link
-              href="#"
-              className="group flex items-center gap-4 rounded-xl border p-5 hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-muted/50">
-                <KanbanIcon className="h-5 w-5 text-muted-foreground" />
+            <div className="flex items-center gap-4 rounded-xl border bg-card p-5 opacity-60">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-500/10">
+                <KanbanIcon className="h-5 w-5 text-violet-500" />
               </div>
               <div>
                 <p className="font-medium">Kanban Board</p>
-                <p className="text-muted-foreground text-xs mt-0.5">Coming soon</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Coming soon</p>
               </div>
-            </Link>
-            <Link
-              href="#"
-              className="group flex items-center gap-4 rounded-xl border p-5 hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-muted/50">
-                <FileTextIcon className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <div className="flex items-center gap-4 rounded-xl border bg-card p-5 opacity-60">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/10">
+                <FileTextIcon className="h-5 w-5 text-blue-500" />
               </div>
               <div>
                 <p className="font-medium">Docs</p>
-                <p className="text-muted-foreground text-xs mt-0.5">Coming soon</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Coming soon</p>
               </div>
-            </Link>
-            <Link
-              href="#"
-              className="group flex items-center gap-4 rounded-xl border p-5 hover:bg-muted/50 transition-colors"
-            >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-muted/50">
-                <CalendarDaysIcon className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <div className="flex items-center gap-4 rounded-xl border bg-card p-5 opacity-60">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
+                <CalendarDaysIcon className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
                 <p className="font-medium">Planner</p>
-                <p className="text-muted-foreground text-xs mt-0.5">Coming soon</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Coming soon</p>
               </div>
-            </Link>
+            </div>
           </div>
         </div>
       </SidebarInset>

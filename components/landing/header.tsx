@@ -11,8 +11,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
       <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="text-xl font-bold tracking-tight">
-          collvy
+        <Link href="/" className="inline-flex items-center gap-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary">
+            <span className="text-xs font-bold text-primary-foreground">C</span>
+          </div>
+          <span className="text-xl font-bold tracking-tight">collvy</span>
         </Link>
 
         <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 text-sm md:flex">

@@ -92,6 +92,10 @@ export default async function SettingsPage() {
         </header>
 
         <div className="flex flex-1 flex-col gap-8 p-6 max-w-2xl">
+          <div>
+            <h1 className="text-2xl font-semibold">Settings</h1>
+            <p className="text-sm text-muted-foreground mt-1">{workspace.name}</p>
+          </div>
           <GeneralSection
             workspaceId={workspace.id}
             workspaceName={workspace.name}

@@ -81,12 +81,16 @@ export default async function DashboardPage() {
             </p>
           </div>
           {projects.length === 0 ? (
-            <div className="flex flex-1 items-center justify-center rounded-xl border border-dashed">
+            <div className="flex flex-1 items-center justify-center rounded-2xl border border-dashed">
               <div className="text-center">
-                <p className="text-muted-foreground text-sm">No projects yet</p>
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                  <ProjectIcon icon="folder" className="h-6 w-6 text-primary" />
+                </div>
+                <p className="font-medium">No projects yet</p>
+                <p className="mt-1 text-sm text-muted-foreground">Create your first project to get started</p>
                 <a
                   href="/dashboard/projects/new"
-                  className="mt-2 inline-block text-sm font-medium underline underline-offset-4"
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
                 >
                   Create a project
                 </a>
@@ -98,12 +102,13 @@ export default async function DashboardPage() {
                 <a
                   key={project.id}
                   href={`/dashboard/projects/${project.id}`}
-                  className="group rounded-xl border p-4 hover:bg-muted/50 transition-colors"
+                  className="group rounded-xl border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-black/5 dark:hover:shadow-black/20"
                 >
-                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border bg-muted/50">
-                    <ProjectIcon icon={project.icon} className="h-4 w-4" />
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                    <ProjectIcon icon={project.icon} className="h-5 w-5 text-primary" />
                   </div>
                   <p className="font-medium">{project.name}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{workspace.name}</p>
                 </a>
               ))}
             </div>

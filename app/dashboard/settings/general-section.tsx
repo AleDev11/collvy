@@ -57,6 +57,7 @@ export function GeneralSection({ workspaceId, workspaceName, inviteCode, current
             defaultValue={workspaceName}
             disabled={!canEdit}
             maxLength={50}
+            className="max-w-sm"
           />
           {nameState?.error && (
             <p className="text-xs text-destructive">{nameState.error}</p>
@@ -78,7 +79,7 @@ export function GeneralSection({ workspaceId, workspaceName, inviteCode, current
         <p className="text-xs text-muted-foreground">
           Share this code with teammates so they can join your workspace.
         </p>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 max-w-sm">
           <Input
             readOnly
             value={inviteCode}

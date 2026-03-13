@@ -14,13 +14,19 @@ export function Hero() {
         <div className="absolute bottom-0 left-0 right-0 h-40 bg-linear-to-t from-background to-transparent" />
       </div>
 
-      <div className="mb-4 inline-flex items-center rounded-full border border-border/60 bg-muted/50 px-4 py-1.5 text-xs text-muted-foreground">
+      <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-200/60 bg-violet-50/80 px-4 py-1.5 text-xs text-violet-700 dark:border-violet-500/20 dark:bg-violet-500/10 dark:text-violet-400">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-violet-400 opacity-75" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-violet-500" />
+        </span>
         Open source — Boards + Docs + Planner
       </div>
 
       <h1 className="max-w-3xl text-4xl font-bold leading-tight tracking-tight md:text-6xl">
         Trello, Notion &amp; Planner{" "}
-        <span className="text-primary">unified</span>
+        <span className="bg-linear-to-r from-violet-500 via-blue-500 to-cyan-400 bg-clip-text text-transparent">
+          unified
+        </span>
       </h1>
 
       <p className="mt-6 max-w-xl text-lg text-muted-foreground">
@@ -29,7 +35,7 @@ export function Hero() {
       </p>
 
       <div className="mt-10 flex gap-4">
-        <Button size="lg" asChild>
+        <Button size="lg" className="bg-linear-to-r from-violet-600 to-blue-600 text-white shadow-lg shadow-violet-500/25 hover:from-violet-500 hover:to-blue-500 border-0" asChild>
           <Link href="/register">
             Start for free
             <ArrowRight className="ml-2 h-4 w-4" />
