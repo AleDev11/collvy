@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react"
 import Link from "next/link"
 import { useEditor, EditorContent, Extension } from "@tiptap/react"
+import Image from "@tiptap/extension-image"
 import StarterKit from "@tiptap/starter-kit"
 import Placeholder from "@tiptap/extension-placeholder"
 import TaskList from "@tiptap/extension-task-list"
@@ -57,6 +58,9 @@ import {
   XIcon,
   RotateCcwIcon,
   ClockIcon,
+  ImageIcon,
+  UploadIcon,
+  LinkIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { updateDocContent, updateDocIcon, deleteDoc, createDoc, getDocVersions, restoreDocVersion } from "../actions"
@@ -111,6 +115,9 @@ type SlashCommand = {
   keywords?: string[]
   command: (props: { editor: any; range: any }) => void
 }
+
+// ── Image command callback (module-level so slash command can call it) ────────
+const _imageCallback = { fn: null as ((editor: any, range: any) => void) | null }
 
 // ── Slash commands ────────────────────────────────────────────────────────────
 
@@ -194,6 +201,16 @@ const SLASH_COMMANDS: SlashCommand[] = [
     keywords: ["hr", "divider", "separator"],
     command: ({ editor, range }) =>
       editor.chain().focus().deleteRange(range).setHorizontalRule().run(),
+  },
+  {
+    title: "Image",
+    description: "Upload or embed an image",
+    icon: <ImageIcon className="h-4 w-4" />,
+    keywords: ["image", "photo", "picture", "img", "upload"],
+    command: ({ editor, range }) => {
+      editor.chain().focus().deleteRange(range).run()
+      _imageCallback.fn?.(editor)
+    },
   },
 ]
 
@@ -304,6 +321,130 @@ function IconPicker({
             ))}
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+// ── Image insert modal ────────────────────────────────────────────────────────
+
+function ImageInsertModal({
+  open,
+  onClose,
+  onInsert,
+}: {
+  open: boolean
+  onClose: () => void
+  onInsert: (src: string) => void
+}) {
+  const [tab, setTab] = useState<"upload" | "url">("upload")
+  const [url, setUrl] = useState("")
+  const [dragging, setDragging] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  function readFile(file: File) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const src = e.target?.result as string
+      if (src) { onInsert(src); onClose() }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  function handleFiles(files: FileList | null) {
+    const file = files?.[0]
+    if (file && file.type.startsWith("image/")) readFile(file)
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setDragging(false)
+    handleFiles(e.dataTransfer.files)
+  }
+
+  function handleUrlInsert() {
+    if (url.trim()) { onInsert(url.trim()); onClose() }
+  }
+
+  if (!open) return null
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+      <div
+        className="bg-popover border rounded-xl shadow-xl w-96 overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b">
+          <span className="text-sm font-semibold">Insert image</span>
+          <button className="p-1 rounded hover:bg-accent transition-colors text-muted-foreground" onClick={onClose}>
+            <XIcon className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="flex border-b">
+          {(["upload", "url"] as const).map((t) => (
+            <button
+              key={t}
+              className={cn(
+                "flex flex-1 items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors capitalize",
+                tab === t
+                  ? "text-foreground border-b-2 border-primary -mb-px"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+              onClick={() => setTab(t)}
+            >
+              {t === "upload" ? <UploadIcon className="h-3.5 w-3.5" /> : <LinkIcon className="h-3.5 w-3.5" />}
+              {t === "upload" ? "Upload" : "URL"}
+            </button>
+          ))}
+        </div>
+        <div className="p-4">
+          {tab === "upload" ? (
+            <div
+              className={cn(
+                "flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed py-10 px-4 text-center transition-colors cursor-pointer",
+                dragging ? "border-primary bg-primary/5" : "border-muted-foreground/20 hover:border-muted-foreground/40",
+              )}
+              onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={handleDrop}
+              onClick={() => fileRef.current?.click()}
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                <UploadIcon className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">Click to upload or drag & drop</p>
+                <p className="text-xs text-muted-foreground mt-0.5">PNG, JPG, GIF, WebP</p>
+              </div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleFiles(e.target.files)}
+              />
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <input
+                type="url"
+                placeholder="https://example.com/image.png"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleUrlInsert()}
+                className="w-full rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30"
+                autoFocus
+              />
+              <button
+                onClick={handleUrlInsert}
+                disabled={!url.trim()}
+                className="w-full rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-opacity disabled:opacity-50"
+              >
+                Insert image
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -441,6 +582,8 @@ export function DocEditor({
   const [versions, setVersions] = useState<DocVersionItem[]>([])
   const [historyLoading, setHistoryLoading] = useState(false)
   const [restoringId, setRestoringId] = useState<string | null>(null)
+  const [imageInsertOpen, setImageInsertOpen] = useState(false)
+  const pendingEditorRef = useRef<any>(null)
   const [, startTransition] = useTransition()
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -495,6 +638,7 @@ export function DocEditor({
                   slashItemsRef.current = props.items
                   setSlashIdx(0); slashIdxRef.current = 0
                   if (rect) setSlashPos({ top: rect.bottom + 8, left: Math.min(rect.left, globalThis.innerWidth - 300) })
+                  if (props.items.length === 0) setSlashOpen(false)
                 },
                 onExit: () => { suggestionRef.current = null; setSlashOpen(false) },
                 onKeyDown: (props: any) => {
@@ -508,8 +652,10 @@ export function DocEditor({
                     const next = (slashIdxRef.current - 1 + (slashItemsRef.current.length || 1)) % (slashItemsRef.current.length || 1)
                     slashIdxRef.current = next; setSlashIdx(next); return true
                   }
-                  if (event.key === "Enter") {
-                    const item = slashItemsRef.current[slashIdxRef.current]
+                  if (event.key === "Enter" || event.key === "Tab") {
+                    const items = slashItemsRef.current
+                    if (items.length === 0) { setSlashOpen(false); return event.key === "Tab" }
+                    const item = items[slashIdxRef.current] ?? items[0]
                     if (item && suggestionRef.current)
                       item.command({ editor: suggestionRef.current.editor, range: suggestionRef.current.range })
                     setSlashOpen(false); return true
@@ -537,11 +683,40 @@ export function DocEditor({
       TextStyle,
       Highlight.configure({ multicolor: false }),
       Typography,
+      Image.configure({ allowBase64: true, HTMLAttributes: { class: "doc-image" } }),
       slashExtension,
     ],
     immediatelyRender: false,
     content: Object.keys(doc.content ?? {}).length === 0 ? "" : (doc.content as any),
-    editorProps: { attributes: { class: "doc-editor-content outline-none min-h-64" } },
+    editorProps: {
+      attributes: { class: "doc-editor-content outline-none min-h-64" },
+      handlePaste(_, event) {
+        const file = event.clipboardData?.files[0]
+        if (file?.type.startsWith("image/")) {
+          const reader = new FileReader()
+          reader.onload = (e) => {
+            const src = e.target?.result as string
+            if (src) this.commands.setImage({ src })
+          }
+          reader.readAsDataURL(file)
+          return true
+        }
+        return false
+      },
+      handleDrop(_, event) {
+        const file = event.dataTransfer?.files[0]
+        if (file?.type.startsWith("image/")) {
+          const reader = new FileReader()
+          reader.onload = (e) => {
+            const src = e.target?.result as string
+            if (src) this.commands.setImage({ src })
+          }
+          reader.readAsDataURL(file)
+          return true
+        }
+        return false
+      },
+    },
     onUpdate: ({ editor }) => scheduleSave(title, editor.getJSON()),
     onSelectionUpdate: ({ editor }) => {
       const { from, to } = editor.state.selection
@@ -585,6 +760,20 @@ export function DocEditor({
 
   function handleDelete() {
     startTransition(async () => { await deleteDoc(doc.id, projectId) })
+  }
+
+  useEffect(() => {
+    _imageCallback.fn = (ed: any) => {
+      pendingEditorRef.current = ed
+      setImageInsertOpen(true)
+    }
+    return () => { _imageCallback.fn = null }
+  }, [])
+
+  function handleImageInsert(src: string) {
+    const ed = pendingEditorRef.current ?? editor
+    ed?.chain().focus().setImage({ src }).run()
+    pendingEditorRef.current = null
   }
 
   async function handleOpenHistory() {
@@ -855,6 +1044,12 @@ export function DocEditor({
           </div>
         </div>
       )}
+
+      <ImageInsertModal
+        open={imageInsertOpen}
+        onClose={() => setImageInsertOpen(false)}
+        onInsert={handleImageInsert}
+      />
 
       <ConfirmDialog
         open={deleteOpen}

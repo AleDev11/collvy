@@ -318,3 +318,18 @@
   float: left;
   height: 0;
 }
+
+/* Images */
+.doc-editor-content img.doc-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 0.75em 0;
+  display: block;
+  cursor: default;
+}
+
+.doc-editor-content img.doc-image.ProseMirror-selectednode {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
