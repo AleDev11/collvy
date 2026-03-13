@@ -19,9 +19,12 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
-  accounts Account[]
-  sessions Session[]
-  workspaces WorkspaceMember[]
+  accounts      Account[]
+  sessions      Session[]
+  workspaces    WorkspaceMember[]
+  assignedCards Card[]        @relation("CardAssignee")
+  comments      Comment[]
+  activityLogs  ActivityLog[]
 }
 
 model Account {
@@ -85,6 +88,8 @@ model Project {
   updatedAt   DateTime @updatedAt
 
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  columns   Column[]
+  cards     Card[]
 }
 
 model WorkspaceMember {
@@ -98,4 +103,62 @@ model WorkspaceMember {
   workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([userId, workspaceId])
+}
+
+// ─── Kanban ─────────────────────────────────────────────────
+
+model Column {
+  id        String   @id @default(cuid())
+  name      String
+  color     String   @default("#8b5cf6")
+  order     Int
+  projectId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  cards   Card[]
+}
+
+model Card {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  order       Int
+  columnId    String
+  projectId   String
+  dueDate     DateTime?
+  assigneeId  String?
+  labels      String[]  @default([])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  column       Column        @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignee     User?         @relation("CardAssignee", fields: [assigneeId], references: [id])
+  comments     Comment[]
+  activityLogs ActivityLog[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  body      String
+  cardId    String
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  card   Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  cardId    String
+  userId    String
+  message   String
+  createdAt DateTime @default(now())
+
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id])
 }

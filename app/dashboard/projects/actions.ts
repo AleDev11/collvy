@@ -4,6 +4,7 @@ import { requireAuth } from "@/lib/auth-guard"
 import { db } from "@/lib/db"
 import { createProjectSchema } from "@/lib/validations/project"
 import { redirect } from "next/navigation"
+import { revalidatePath } from "next/cache"
 
 async function getWorkspaceForUser(userId: string) {
   const membership = await db.workspaceMember.findFirst({
@@ -39,6 +40,23 @@ export async function createProject(formData: FormData) {
   })
 
   redirect(`/dashboard/projects/${project.id}`)
+}
+
+export async function updateProject(projectId: string, name: string, icon: string) {
+  const session = await requireAuth()
+
+  const project = await db.project.findUnique({
+    where: { id: projectId },
+    include: { workspace: { include: { members: { where: { userId: session.user.id } } } } },
+  })
+
+  if (!project || project.workspace.members.length === 0) {
+    return { error: "Project not found" }
+  }
+
+  await db.project.update({ where: { id: projectId }, data: { name, icon } })
+  revalidatePath(`/dashboard/projects/${projectId}`)
+  revalidatePath("/dashboard")
 }
 
 export async function deleteProject(projectId: string) {
