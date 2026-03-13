@@ -58,7 +58,7 @@ export function NewProjectForm() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(5, 2.5rem)",
+              gridTemplateColumns: "repeat(5, 1fr)",
               gap: "0.375rem",
             }}
           >
@@ -68,15 +68,14 @@ export function NewProjectForm() {
                 type="button"
                 title={icon}
                 onClick={() => setSelectedIcon(icon)}
-                style={{ width: "2.5rem", height: "2.5rem", flexShrink: 0 }}
                 className={cn(
-                  "flex items-center justify-center rounded-lg transition-all",
+                  "aspect-square w-full flex items-center justify-center rounded-lg transition-all",
                   selectedIcon === icon
                     ? "bg-primary text-primary-foreground"
                     : "border text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
-                <ProjectIcon icon={icon} className="h-4 w-4" />
+                <ProjectIcon icon={icon} className="h-5 w-5" />
               </button>
             ))}
           </div>
