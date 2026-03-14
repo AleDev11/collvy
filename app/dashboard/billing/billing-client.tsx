@@ -202,25 +202,31 @@ export function BillingClient({
             <h3 className="font-semibold">
               {tier === "FREE" ? "Upgrade your plan" : "Upgrade to Business"}
             </h3>
-            <div className="inline-flex items-center rounded-full border bg-muted/40 p-1 text-sm">
+            <div className="inline-flex items-center rounded-full border bg-muted p-1">
               <button
+                type="button"
                 onClick={() => setAnnual(false)}
                 className={cn(
-                  "rounded-full px-3 py-1 text-xs transition-colors",
-                  !annual ? "bg-background font-medium shadow-xs" : "text-muted-foreground"
+                  "rounded-full px-4 py-1.5 text-xs font-medium transition-all",
+                  !annual
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Monthly
               </button>
               <button
+                type="button"
                 onClick={() => setAnnual(true)}
                 className={cn(
-                  "rounded-full px-3 py-1 text-xs transition-colors",
-                  annual ? "bg-background font-medium shadow-xs" : "text-muted-foreground"
+                  "rounded-full px-4 py-1.5 text-xs font-medium transition-all",
+                  annual
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Annual
-                <span className="ml-1 text-violet-500">−25%</span>
+                <span className={cn("ml-1.5 text-[10px] font-semibold", annual ? "text-violet-500" : "text-muted-foreground")}>−25%</span>
               </button>
             </div>
           </div>
@@ -256,6 +262,11 @@ export function BillingClient({
                           <span className="text-xl font-bold">${price}</span>
                           <span className="text-xs text-muted-foreground">/mo</span>
                         </div>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {annual
+                            ? `billed annually · $${price * 12}/yr`
+                            : "billed monthly"}
+                        </p>
                       </div>
                     </div>
 
